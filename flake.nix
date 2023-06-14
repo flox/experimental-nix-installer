@@ -19,6 +19,7 @@
       # Omitting `inputs.nixpkgs.follows = "nixpkgs";` on purpose
     };
 
+    flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
   };
 
   outputs =
@@ -65,7 +66,7 @@
           };
           sharedAttrs = {
             pname = "nix-installer";
-            version = "0.8.1-unreleased";
+            version = "0.9.2-unreleased";
             src = builtins.path {
               name = "nix-installer-source";
               path = self;
@@ -139,13 +140,19 @@
               cacert
               cargo-audit
               nixpkgs-fmt
+              semodule-utils
+              checkpolicy
               check.check-rustfmt
               check.check-spelling
               check.check-nixpkgs-fmt
               check.check-editorconfig
               check.check-semver
             ]
-            ++ lib.optionals (pkgs.stdenv.isDarwin) (with pkgs; [ libiconv ]);
+            ++ lib.optionals (pkgs.stdenv.isDarwin) (with pkgs; [ libiconv ])
+            ++ lib.optionals (pkgs.stdenv.isLinux) (with pkgs; [
+              podman
+              /* users are expected to have a system docker, too */
+            ]);
           };
         });
 
