@@ -2,10 +2,14 @@
   description = "Experimental Nix Installer";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/63c3a29ca82437c87573e4c6919b09a24ea61b0f";
+    # I translated upstream versioning with
+    # git show $most_recently_merged_commit:flake.lock | jq '.nodes[.nodes.root.inputs.nixpkgs].locked.rev'
+    nixpkgs.url = "github:NixOS/nixpkgs/06cf0e1da4208d3766d898b7fdab6513366d45b9";
 
+    # I translated upstream versioning with
+    # git show $most_recently_merged_commit:flake.lock | jq '.nodes[.nodes.root.inputs.fenix].locked.rev'
     fenix = {
-      url = "github:nix-community/fenix/73124e1356bde9411b163d636b39fe4804b7ca45";
+      url = "github:nix-community/fenix/a9d2e5fa8d77af05240230c9569bbbddd28ccfaf";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -19,19 +23,6 @@
       # Omitting `inputs.nixpkgs.follows = "nixpkgs";` on purpose
     };
 
-    determinate = {
-      url = "https://flakehub.com/f/DeterminateSystems/determinate/0.1.tar.gz";
-
-      # We set the overrides below so the flake.lock has many fewer nodes.
-      #
-      # The `determinate` input is used to access the builds of `determinate-nixd`.
-      # Below, we access the `packages` outputs, which download static builds of `determinate-nixd` and makes them executable.
-      # The way we consume the determinate flake means the `nix` and `nixpkgs` inputs are not meaningfully used.
-      # This means `follows` won't cause surprisingly extensive rebuilds, just trivial `chmod +x` rebuilds.
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nix.follows = "nix";
-    };
-
     flake-compat.url = "github:edolstra/flake-compat/v1.0.0";
   };
 
@@ -41,12 +32,11 @@
     , fenix
     , naersk
     , nix
-    , determinate
     , ...
     } @ inputs:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-      systemsSupportedByDeterminateNixd = [  ]; # avoid refs to detsys nixd for now
+      systemsSupportedByDeterminateNixd = [ ]; # avoid refs to detsys nixd for now
 
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: (forSystem system f));
 
@@ -73,7 +63,7 @@
         inputs.nix.tarballs_direct.${system}
           or "${inputs.nix.checks."${system}".binaryTarball}/nix-${inputs.nix.packages."${system}".default.version}-${system}.tar.xz");
 
-      optionalPathToDeterminateNixd = system: if builtins.elem system systemsSupportedByDeterminateNixd then "${inputs.determinate.packages.${system}.default}/bin/determinate-nixd" else null;
+      optionalPathToDeterminateNixd = system: null;
     in
     {
       overlays.default = final: prev:
@@ -95,6 +85,7 @@
             nativeBuildInputs = with final; [ ];
             buildInputs = with final; [ ] ++ lib.optionals (final.stdenv.isDarwin) (with final.darwin.apple_sdk.frameworks; [
               SystemConfiguration
+              final.darwin.libiconv
             ]);
 
             copyBins = true;
