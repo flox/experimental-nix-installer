@@ -9,10 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@v16
+        uses: DeterminateSystems/update-flake-lock@a0c5484d59e7d32ccfb416fe8bae8db583b9febb # v16
+
