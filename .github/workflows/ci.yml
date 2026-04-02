@@ -10,14 +10,17 @@ jobs:
     name: Lints
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache lint store (x86_64-linux)
         id: lint-store-x86_64-linux
-        uses: actions/cache@v3
+        uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
+
         with:
           path: ~/.ci-store
           key: lint-store-x86_64-linux-${{ hashFiles('**/Cargo.lock', '**/flake.lock') }}-v1
@@ -30,7 +33,8 @@ jobs:
       - name: Check EditorConfig conformance
         run: nix develop --store ~/.ci-store --command check-editorconfig
       - name: Download Buildkite Artifacts
-        uses: EnricoMi/download-buildkite-artifact-action@v1.14
+        uses: EnricoMi/download-buildkite-artifact-action@0a028539baae6de8ff88538a8f9ab0a9aeb8e7ec # v1.14
+
         with:
           buildkite_token: ${{ secrets.BUILDKITE_TOKEN }}
           output_path: artifacts
@@ -41,7 +45,8 @@ jobs:
       # Mac's can't run this action, so we're forced to do this.
       - name: Create Github cache from Buildkite artifacts
         id: cache-buildkite-artifacts
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@6f8efc29b200d32929f49075959781ed54ec270c # v3
+
         with:
           path: artifacts
           key: buildkite-artifacts-${{ github.sha }}
@@ -51,10 +56,12 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [lints]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Restore Github cache of Buildkite artifacts
         id: cache-buildkite-artifacts
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@6f8efc29b200d32929f49075959781ed54ec270c # v3
+
         with:
           path: artifacts
           key: buildkite-artifacts-${{ github.sha }}
@@ -66,7 +73,8 @@ jobs:
           mv ./artifacts/nix-installer-x86_64-linux-*/* install-root/nix-installer-x86_64-linux
           chmod +x install-root/nix-installer-x86_64-linux install-root/nix-installer.sh
       - name: Initial install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           local-root: install-root/
           logger: pretty
@@ -95,7 +103,8 @@ jobs:
             exit 1
           fi
       - name: Repeated install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           local-root: install-root/
           logger: pretty
@@ -155,10 +164,12 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [lints]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Restore Github cache of Buildkite artifacts
         id: cache-buildkite-artifacts
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@6f8efc29b200d32929f49075959781ed54ec270c # v3
+
         with:
           path: artifacts
           key: buildkite-artifacts-${{ github.sha }}
@@ -170,7 +181,8 @@ jobs:
           mv ./artifacts/nix-installer-x86_64-linux-*/* install-root/nix-installer-x86_64-linux
           chmod +x install-root/nix-installer-x86_64-linux install-root/nix-installer.sh
       - name: Initial install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           init: none
           planner: linux
@@ -203,7 +215,8 @@ jobs:
             exit 1
           fi
       - name: Repeated install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           init: none
           planner: linux
@@ -265,10 +278,12 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [lints]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Restore Github cache of Buildkite artifacts
         id: cache-buildkite-artifacts
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@6f8efc29b200d32929f49075959781ed54ec270c # v3
+
         with:
           path: artifacts
           key: buildkite-artifacts-${{ github.sha }}
@@ -286,7 +301,8 @@ jobs:
           sudo chmod +x /bin/steamos-readonly
           sudo useradd -m deck
       - name: Initial install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           local-root: install-root/
           logger: pretty
@@ -321,7 +337,8 @@ jobs:
             exit 1
           fi
       - name: Repeated install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           local-root: install-root/
           logger: pretty
@@ -387,10 +404,12 @@ jobs:
     runs-on: macos-12
     needs: [lints]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
+
       - name: Restore Github cache of Buildkite artifacts
         id: cache-buildkite-artifacts
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@6f8efc29b200d32929f49075959781ed54ec270c # v3
+
         with:
           path: artifacts
           key: buildkite-artifacts-${{ github.sha }}
@@ -402,7 +421,8 @@ jobs:
           mv ./artifacts/nix-installer-x86_64-darwin-*/* install-root/nix-installer-x86_64-darwin
           chmod +x install-root/nix-installer-x86_64-darwin install-root/nix-installer.sh
       - name: Initial install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           local-root: install-root/
           logger: pretty
@@ -419,7 +439,8 @@ jobs:
           NIX_INSTALLER_LOG_DIRECTIVES: nix_installer=debug
           RUST_BACKTRACE: full
       - name: Repeated install
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@430608d219b9321ec0c98eb6c37245a39aa6756e # main
+
         with:
           local-root: install-root/
           logger: pretty
